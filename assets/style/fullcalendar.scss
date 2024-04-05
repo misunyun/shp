@@ -1,0 +1,105 @@
+:root {
+    .fc-dayGridMonth-view {
+        --fc-daygrid-event-dot-width: 4px;
+    }
+}
+
+.fc-theme-standard .fc-dayGridMonth-view td, .fc-theme-standard .fc-dayGridMonth-view th {
+    border: {
+        style: none !important;
+        width: 0 !important;
+    }
+}
+
+.fc {
+    table.fc-scrollgrid {
+        border: none;
+    }
+
+    .fc-toolbar-title {
+        display: inline-block;
+        // width: 90px;
+        font: {
+            size: 16px;
+            weight: 700;
+        }
+        // text-align: right;
+        vertical-align: middle;
+
+        + .fc-arrow-button {
+            position: relative;
+            width: 38px;
+            height: 32px;
+            margin-left: 0 !important;
+            background-color: #fff;
+            background-image: url('/assets/images/svg/icon/arrow_down_black.svg');
+            background-repeat: no-repeat;
+            background-position: center;
+            border: none;
+            box-shadow: none !important;
+            text-indent: -9999px;
+            &:hover, &:active, &:visited {
+                background-color: #fff !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+
+    .fc-dayGridMonth-view {
+
+        .fc-daygrid-day-top {
+            justify-content: center;
+            padding-top: 10px;
+        }
+        .fc-event-time, .fc-event-title {
+            display: none;
+        }
+
+        .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 0.5rem;
+            text-align: center;
+        }
+        .fc-daygrid-event-harness {
+            display: inline-block;
+            // width: 6px;
+            .fc-daygrid-event-dot {
+                margin: 0;
+                // border-color: #5A7FE7;
+            }
+            &:nth-child(n+6) {
+                display: none; 
+                .fc-daygrid-event-dot {
+                    display: none; 
+                }
+            }
+        }
+        .fc-daygrid-dot-event {
+            display: inline-block;
+            width: 6px;
+            margin: 0 !important;
+            border-radius: 3px;
+        }
+
+        .fc-daygrid-day.fc-day-today {
+            background-color: transparent;
+        }
+        .fc-day-today .fc-daygrid-day-number {
+            background-color: $background-color;
+            border-radius: 20px;
+            color: #fff;
+        }
+
+        .fc-daygrid-day-number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            // padding-top: 7px;
+            border-radius: 20px;
+        }
+
+    }
+}

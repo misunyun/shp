@@ -1,0 +1,44 @@
+@keyframes blurSlidein {
+    from {
+        filter: none;
+        -webkit-filter: none;
+    }
+    to {
+        filter: blur(1px);
+        -webkit-filter: blur(1px);
+    }
+}
+
+@keyframes blurSlideout {
+    from {
+        filter: blur(1px);
+        -webkit-filter: blur(1px);
+    }
+    to {
+        filter: none;
+        -webkit-filter: none;
+    }
+}
+
+
+@keyframes upDowonShadowSlidein {
+    from {
+        box-shadow: 0px 0px 0px 0px #fff;
+        top: 0;
+    }
+    to {
+        box-shadow: 0px 5px 8px 0px #00000026;
+        top: -10px;
+    }
+}
+
+@keyframes upDowonShadowSlideout {
+    from {
+        box-shadow: 0px 5px 8px 0px #00000026;
+        top: -10px;
+    }
+    to {
+        box-shadow: 0px 0px 0px 0px #fff;
+        top: 0;
+    }
+}

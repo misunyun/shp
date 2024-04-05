@@ -1,0 +1,37 @@
+:root {
+    .swiper_wrap {
+        --swiper-pagination-bottom: 140px;
+
+        .swiper-pagination-bullet {
+            width: 6px; 
+            height: 6px; 
+            background-color: rgba(255, 255, 255, 0.4); 
+            border-radius: 3px;
+            opacity: 1;
+        }
+        .swiper-pagination-bullet-active { 
+            width: 16px; 
+            height: 6px; 
+            transition: width 0.5s;
+            background-color: rgba(255, 255, 255, 1);
+            border-radius: 3px;
+        }
+
+        &.my_program {
+            --swiper-navigation-top-offset: 36%;
+            
+            .swiper-button-prev, .swiper-button-next {
+                width: 40px;
+                height: 40px;
+                background-color: rgba(255, 255, 255, 1);
+                border-radius: 20px;
+                opacity: 1;
+
+                --swiper-navigation-sides-offset: -20px;
+
+                box-shadow: 0px 5px 8px 0px #00000026;
+
+            }
+        }
+    }
+}
