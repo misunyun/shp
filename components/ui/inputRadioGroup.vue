@@ -1,8 +1,16 @@
 <template>
     <ul :class="radioOption.class">
-        <li v-for="(option, index) in radioOption.options" :key="`${radioOption.name}_${index}`">
+        <li v-for="(item, index) in radioOption.options" :key="`${radioOption.name}_${index}`">
             <input type="radio" :id="`${radioOption.name}_${index}`" :name="radioOption.name">
-            <label :for="`${radioOption.name}_${index}`">{{ option.name }}</label>
+            <label :for="`${radioOption.name}_${index}`">{{ item.name }}</label>
+            <!-- v-for의 item은 loop돌릴 배열의 요소들의 별칭
+                예) v-for="(딸들, 순서) in 미선이가족" :key="순서값"
+                불러올 데이터 값의 항목은 "딸들.이름"
+
+                sample : <div v-for="(딸들, 순서) in 미선이가족" :key="순서값">
+                    <span>{{딸들.이름}}</span>
+                </div>
+             -->
         </li>
     </ul>
     
