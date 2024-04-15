@@ -22,6 +22,7 @@
         :modules="modules"
         @swiper="onSwiper"
         @slideChange="onSlideChange"
+        @resize="resize"
     >
         <swiper-slide 
             v-for="(slide, index) in state.slides" 
@@ -29,28 +30,70 @@
             :key="index" 
             @click="slide?.to ? slideClick(slide) : null"
         >
-            <div class="slide" v-if="type === 'COUPON'" :class="`${type?.toLowerCase()}_slide`">
+            <div 
+                class="slide" 
+                :class="`${type?.toLowerCase()}_slide`"
+                v-if="type === 'COUPON'"
+            >
                 <div class="title" v-if="slide.title">{{slide.title}}</div>
                 <div class="type" v-if="slide.type">{{slide.type}}</div>
                 <div class="text" v-if="slide.text">{{slide.text}}</div>
-                <div class="detail">자세히</div>
+                <div class="detail" v-if="slide.count"><span>{{slide.count.use}}</span>/{{slide.count.total}}회</div>
+                <div class="detail" v-else>자세히</div>
             </div>
-            <div class="slide" v-else-if="type === 'FACILITY_GUIDE'">
-                <div><img :src="slide.src" alt="" v-if="slide.src"/></div>
+            <div 
+                class="slide" 
+                @mouseenter="$event.target.classList.add('over')" 
+                @mouseleave="$event.target.classList.remove('over')" 
+                v-else-if="type === 'FACILITY_GUIDE'"
+            >
+                <div class="image_wrap">
+                    <img :src="slide.imgSrc" alt="" v-if="slide.imgSrc"/>
+                </div>
                 <div class="type_title">
                     <div class="type" v-if="slide.type">{{slide.type}}</div>
                     <div class="title" v-if="slide.title">{{slide.title}}</div>
                 </div>
+                <div class="hover">자세히보기</div>
             </div>
-            <div class="slide" v-else >
-                <div><img :src="slide.src" alt="" v-if="slide.src" ref="sldeImageRef"  /></div>
+            <div 
+                class="slide" 
+                @mouseenter="$event.target.classList.add('over')" 
+                @mouseleave="$event.target.classList.remove('over')" 
+                v-else 
+            >
+                <div class="image_wrap" >
+                    <img 
+                        :src="slide.imgSrc" 
+                        alt="" 
+                        v-if="slide.imgSrc"
+                        :style="`height: ${thumbnailHeight ?? 'auto'}`"
+                    />
+                    <video 
+                        autoplay loop muted 
+                        alt=""
+                        playsinline
+                        webkit-playsinline=""
+                        v-else-if="slide.movSrc"
+                        :style="`height: ${thumbnailHeight ?? 'auto'}`"
+                    >
+                        <source :src="slide.movSrc" type="video/mp4" />
+                    </video>
+                </div>
                 <ul class="events" v-if="slide.events">
-                    <li v-for="(event, index) in slide.events" :class="event.type" :key="`${type?.toLowerCase()}_${index}`">{{ event.name }}</li>
+                    <li 
+                        v-for="(event, index) in slide.events" 
+                        :class="event.type" 
+                        :key="`${type?.toLowerCase()}_${index}`"
+                    >
+                        {{ event.name }}
+                    </li>
                 </ul>
                 <div class="type" v-if="slide.type">{{slide.type}}</div>
                 <div class="title" v-if="slide.title">{{slide.title}}</div>
                 <div class="text" v-if="slide.text">{{slide.text}}</div>
                 <div class="count" v-if="slide.count"><strong>{{slide.count.use}}</strong> / {{slide.count.total}}회</div>
+                <div class="hover" :style="{ top: prevNextTop }">{{ type === 'MY_PROGRAM'? '자세히보기' : '상담' }}</div>
             </div>
         </swiper-slide>
         
@@ -58,7 +101,7 @@
             class="btn_prev" 
             @click="swiper.slidePrev()"
             :style="{ top: prevNextTop }"
-            v-if="isMouseOver"
+            v-if="isMouseOver && state.slides.length > 3"
         >
             이전 
         </button>
@@ -66,7 +109,7 @@
             class="btn_next" 
             @click="swiper.slideNext()"
             :style="{ top: prevNextTop }"
-            v-if="isMouseOver"
+            v-if="isMouseOver && state.slides.length > 3"
         >
             다음 
         </button>
@@ -89,7 +132,6 @@ export default {
         const store = useDefaultStore();
 
         const swiperRef = ref(null);
-        const sldeImageRef = ref(null);
 
         const swiperProgressBar = ref(null);
         const state = reactive(props);
@@ -99,7 +141,6 @@ export default {
             modules: [ Autoplay, Pagination, Navigation ],
             state,
             swiperRef,
-            sldeImageRef,
         }
     },
     components: {
@@ -136,6 +177,7 @@ export default {
             slideLength: null,
             prevNextTop: '50%',
             isMouseOver: false,
+            thumbnailHeight: null,
         }
     },
     mounted() {
@@ -178,6 +220,14 @@ export default {
             this.swiper.hostEl.removeEventListener("mouseout", this.swiperMouseEvent);
             this.swiper.hostEl.addEventListener("mouseover", this.swiperMouseEvent);
             this.swiper.hostEl.addEventListener("mouseout", this.swiperMouseEvent);
+            if (this.type === 'RECOMMEND') {// 추천프로그램
+                this.thumbnailHeight = (this.swiper.slidesSizesGrid[0] * 66.77631 / 100) + 'px';
+            }
+        },
+        resize (swiper) {
+            if (this.type === 'RECOMMEND') {// 추천프로그램
+                this.thumbnailHeight = (this.swiper.slidesSizesGrid[0] * 66.77631 / 100) + 'px';
+            }
         },
         onSlideChange (swiper) {
             this.activeIndex = swiper.realIndex;
@@ -236,6 +286,15 @@ export default {
         }
     }
 
+    .image_wrap {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        img, video {
+            object-fit: cover;
+        }
+    }
+
     &.coupon {
         .swiper-slide {
             
@@ -243,7 +302,7 @@ export default {
 
             .slide {
                 height: 110px;
-                padding: 13px 20px 0;
+                padding: 13px 80px 0 20px;
                 background: {
                     image: url("/assets/images/png/coupon_bg_01.png");
                     repeat: no-repeat;
@@ -261,12 +320,18 @@ export default {
                 }
                 color: $font-color-dark-ultra;
             }
+            .text {
+                font-size: 14px;
+            }
             .detail {
                 position: absolute;
                 top: 48px;
                 left: 220px;
                 font-size: 14px;
                 color: $font-color-light;
+                > span {
+                    color: $font-color-dark-ultra;
+                }
             }
         }
     }
@@ -284,6 +349,7 @@ export default {
         }
         .type {
             font: {
+                family: Saira Condensed Bold;
                 size: 32px;
                 weight: 700;
             }
@@ -299,11 +365,15 @@ export default {
         }
         .type_title {
             position: absolute;
-            top:50%;
+            top: 50%;
             left:50%;
-            transform:translate(-50%, -50%);
+            transform: translate(-50%, -50%);
             text-align: center;
         }
+    }
+
+    .hover {
+        display: none;
     }
 
     .slide {
@@ -312,10 +382,13 @@ export default {
     .type {
         margin-top: 20px;
         font: {
-            size: 14px;
+            size: 15px;
             weight: 400;
         }
         color: $font-color-light;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     .title {
         margin-top: 7px;
@@ -324,14 +397,20 @@ export default {
             weight: 700;
         }
         color: $font-color-dark-ultra;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     .text {
         margin-top: 8px;
         font: {
-            size: 14px;
+            size: 15px;
             weight: 400;
         }
         color: $font-color-light;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     .count {
         margin-top: 17px;
@@ -354,7 +433,7 @@ export default {
             align-items: center;
             height: 20px;
             max-height: 20px;
-            padding: 0 6px;
+            padding: 1px 6px 0;
             margin-left: 4px;
             border: {
                 style: solid;
@@ -378,6 +457,12 @@ export default {
                 }
                 color: #fff;
             }
+            &.pay {
+                border: {
+                    color: $border-color-black;
+                }
+                color: $font-color-dark-ultra;
+            }
         }
     } 
 }
@@ -400,9 +485,133 @@ export default {
             }
         }
 
+
+
+        &.my_program, &.recommend {
+            .slide {
+                img, video {
+                    animation-duration: 0.2s;
+                    animation-name: blurSlideout;
+                    animation-fill-mode: forwards;
+                }
+                .hover {
+                    animation-duration: 0.2s;
+                    animation-name: upDowonOpacitySlideout;
+                    animation-fill-mode: forwards;
+                }
+                &.over {
+                    img, video {
+                        animation-duration: 0.5s;
+                        animation-name: blurSlidein;
+                        animation-fill-mode: forwards;
+                    }
+                    .hover {
+                        animation-duration: 0.5s;
+                        animation-name: upDowonOpacitySlidein;
+                        animation-fill-mode: forwards;
+                    }
+                }
+            }
+        }
+
+        &.facility_guide {
+            .image_wrap {
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    width: 100%;
+                    background-color: #000;
+                    opacity: 0;
+                    animation-duration: 0.5s;
+                    animation-name: opacityOut_4;
+                    animation-fill-mode: forwards;
+                }
+            }
+            .type {
+                font: {
+                    size: 48px;
+                }
+            }
+            .title {
+                font: {
+                    size: 18px;
+                }
+            }
+            .slide {
+
+                .type_title {
+                    margin-top: 0;
+                    animation-duration: 0.5s;
+                    animation-name: upDowonSlideout;
+                    animation-fill-mode: forwards;
+                }
+                .hover {
+                    display: block;
+                    margin-top: 44px;
+                    opacity: 0;
+                    animation-duration: 0.3s;
+                    animation-name: opacityOut;
+                    animation-fill-mode: forwards;
+                }
+
+                &.over {
+                    .type_title {
+                        animation-duration: 0.2s;
+                        animation-name: upDowonSlidein;
+                        animation-fill-mode: forwards;
+                    }
+                    .hover {
+                        opacity: 0;
+                        animation-delay: 0.2s;
+                        animation-duration: 0.3s;
+                        animation-name: opacityIn;
+                        animation-fill-mode: forwards;
+                    }
+                    .image_wrap {
+                        &:after {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            bottom: 0;
+                            width: 100%;
+                            background-color: #000;
+                            opacity: 0.5;
+
+                            animation-duration: 0.3s;
+                            animation-name: opacityIn_4;
+                            animation-fill-mode: forwards;
+                        }
+                    }
+                }
+            }
+        }
+
+        
+
+        .hover {
+            display: inline-block;
+            position: absolute;
+            top: v-bind(prevNextTop);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            align-content: center;
+            height: 40px;
+            padding: 0 24px;
+            margin-top: 20px;
+            background-color: $header-background-color;
+            border-radius: 20px;
+            font-size: 15px;
+            color: #fff;
+            text-align: center;
+        }
+
         &.my_program {
             .type {
-                font-size: 15px;
+                font-size: 16px;
             }
             .title {
                 margin-top: 6px;
@@ -410,7 +619,7 @@ export default {
             }
             .text {
                 margin-top: 10px;
-                font-size: 15px;
+                font-size: 16px;
             }
             .count {
                 font-size: 18px;
@@ -432,11 +641,12 @@ export default {
                 .type {
                     font-size: 16px;
                 }
-                .type {
+                .text {
                     font-size: 15px;
                 }
                 .detail {
                     left: 245px;
+                    font-size: 15px;
                 }
             }
         }
@@ -455,7 +665,7 @@ export default {
                 }
             }
             .type {
-                font-size: 15px;
+                font-size: 16px;
             }
             .title {
                 margin-top: 6px;
@@ -504,7 +714,7 @@ export default {
                     }
                     transform: rotate(180deg) translate(0, 50%);
                     border-radius: 20px;
-                    box-shadow: 0px 5px 8px 0px #00000026;
+                    box-shadow: 0px -5px 8px 0px #00000026;
                     text-indent: -9999px;
                     z-index: 999;
                 }

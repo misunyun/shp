@@ -3,6 +3,8 @@
         <div class="footer_inner">
             <span class="logo">SHP</span>
             <ul class="link_list">
+
+                
                 <li><NuxtLink>서비스 이용약관</NuxtLink></li>
                 <li><NuxtLink class="bold">개인정보처리방침</NuxtLink></li>
                 <li><NuxtLink>이메일무단수집금지</NuxtLink></li>
@@ -171,6 +173,7 @@
 .pc {
     .footer {
         padding: 40px 20px 80px;
+        margin-top: 100px;
         .footer_inner {
             max-width: 1200px;
             margin: 0 auto;

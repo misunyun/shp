@@ -37,6 +37,7 @@ export default {
 
 <style lang="scss" scoped>
 .title_wrap {
+    position: relative;
     padding: 0 20px;
 }
 .title {
@@ -107,6 +108,9 @@ export default {
     }
     .text {
         margin-top: 7px;
+        font: {
+            size: 18px;
+        }
     }
     
 }

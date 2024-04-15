@@ -52,7 +52,7 @@
                     >
                         <!-- 사용자 이미지가 있을때 -->
                         <img
-                            src="/assets/images/dummy/user_photo_001.jpg"
+                            src="/images/dummy/user_photo_001.jpg"
                             alt="이다인"
                             class="photo"
                         />
@@ -239,7 +239,7 @@ export default {
             }
         },
         selectStoreValue (event) {
-            this.store.eventListener({ name: "UPDATE_STORE_NAME", data: event.currentTarget.textContent });
+            this.store.eventListener({ name: "UPDATE_CENTER", data: event.currentTarget.textContent });
             this.$refs.selectStore.close();
         },
         clickButton () {

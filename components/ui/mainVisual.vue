@@ -1,21 +1,28 @@
 <template>
 <div class="main_visual">
-    <swiper
-        :loop="true"
-        :allowTouchMove="allowTouchMove"
-        :centeredSlides="true"
+    <!--
         :autoplay="
             swiperDelay ? {
                 delay: swiperDelay,
-                disableOnInteraction: false,
+                disableOnInteraction: true,
                 pauseOnMouseEnter: pauseOnMouseEnter
             } : undefined"
+
+        @autoplayTimeLeft="autoplayTimeLeft"
+        :centeredSlides="true"
+    -->
+    <swiper
+        :loop="true"
+        :allowTouchMove="allowTouchMove"
+        
+        
         :pagination="pagination"
         :navigation="navigation"
         :modules="modules"
-        @autoplayTimeLeft="onAutoplayTimeLeft"
         @swiper="onSwiper"
         @slideChange="onSlideChange"
+        @realIndexChange="realIndexChange"
+        @init="onInit"
     >
         <swiper-slide 
             v-for="(slide, index) in state.slides" 
@@ -23,7 +30,9 @@
             :key="index" 
             @click="slide?.to ? slideClick(slide) : null"
         >
-            <div class="slide">
+            <div 
+                class="slide"
+            >
                 <img :src="slide.imgSrc" alt="" class="visual" v-if="slide.imgSrc"/>
                 <div class="video_player" v-else-if="slide.movSrc">
                     <video 
@@ -31,9 +40,15 @@
                         autoplay loop muted 
                         :ref="`videoPlayer`"
                         alt=""
+                        playsinline
+                        webkit-playsinline=""
                     >
                         <source :src="slide.movSrc" type="video/mp4" />
                     </video>
+                </div>
+                <div class="text_area">
+                    <p class="title">{{ slide.title }}</p>
+                    <p class="text">{{ slide.text }}</p>
                 </div>
             </div>
         </swiper-slide>
@@ -64,6 +79,8 @@
 <script>
 import { ref } from 'vue';
 
+import { useDefaultStore } from "~/stores";
+
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -72,14 +89,16 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 
 export default {
     setup(props) {
-        // console.log('props ---------------- ');
-        // console.log(props);
+        
+        const store = useDefaultStore();
+
         const swiperProgressBar = ref(null);
         const state = reactive(props);
         return {
             swiperProgressBar,
             modules: [ Autoplay, Pagination, Navigation ],
             state,
+            store,
         }
     },
     components: {
@@ -93,6 +112,7 @@ export default {
         allowTouchMove: false,
         slides: undefined,
         pauseOnMouseEnter: false,
+        
     },
     data() {
         return {
@@ -101,23 +121,45 @@ export default {
             activeIndex: 0,
             slideLength: null,
             isPlay: false,
+            slideInterval: null,
         }
     },
     mounted() {
-        // console.log(this.state);
+        window.addEventListener('resize', this.resizeEventHandler);
+        this.resizeEventHandler();
     },
-    onUnmounted() {
+    beforeUnmount() {
+        clearInterval(this.slideInterval);
+        window.removeEventListener('resize', this.resizeEventHandler);
     },
     methods: {
+        onInit(swiper) {
+            if (this.store.windowInnerWidth > 1124) {
+                document.querySelectorAll('.main_visual .swiper-slide').forEach((slide) => {
+                    if (slide.classList.contains('swiper-slide-active')) {
+                        slide.querySelector('.text_area').style.display = 'none';
+                    }
+                });
+            }
+            this.swiper = swiper;
+            this.realIndexChange();
+        },
+        resizeEventHandler() {
+            if (this.store.windowInnerWidth > 1124) {
+                const position = (window.innerWidth - 17 - 1200) / 2;
+                document.querySelector('.main_visual .swiper-button-prev').style.left = position + 'px';
+                document.querySelector('.main_visual .swiper-button-next').style.right = position + 'px';
+            }
+            else {
+                document.querySelector('.main_visual .swiper-button-prev').style.left = '10px';
+                document.querySelector('.main_visual .swiper-button-next').style.right ='10px';
+            }
+        },
         async slideClick(slide) {
-            // console.log(slide);
             if (slide.to) {
                 const router = useNuxtApp().$router;
                 await router.push(slide.to);
             }
-        },
-        onAutoplayTimeLeft (swiper, time, progress) {
-            this.$refs.swiperProgressBar.style.width = ((1 - progress) * 100) + '%';
         },
         onSwiper (swiper) {
             this.swiper = swiper;
@@ -128,29 +170,104 @@ export default {
                 this.isPlay = true;
             }
         },
+        setAutoplay() {
+            const _this = this;
+            
+            const autoplayDelay = this.autoplayDelay / 1000;
+            const addValue = autoplayDelay / 100;
+
+            let timer = 0;
+            let isActiveClass = false;
+            function autoplayTime() {
+                if (_this.isPlay) {
+                    
+                    if (!_this.$refs.swiperProgressBar) {
+                        clearInterval(this.slideInterval);
+                        return;
+                    }
+                    
+                    timer += addValue;
+                    // console.log(timer);
+                    const widthPercent = Math.floor((timer / autoplayDelay) * 100); // Calculate based on ratio
+                    // console.log(widthPercent);
+                    // const widthPercent = Math.floor(timer * 2.5);// 10 = 10, 20 = 5, 30 = ???
+                    _this.$refs.swiperProgressBar.style.width = widthPercent + '%';
+                    // console.log(widthPercent);
+
+                    // if (_this.store.windowInnerWidth > 1124 && !isActiveClass) {
+                    //     if (widthPercent >= 10) {
+                    //     }
+                    // }
+                    
+                    if (widthPercent >= 80 && !isActiveClass) {
+                        isActiveClass = true;
+                        if (document.querySelector('.main_visual .swiper-slide-active').classList.contains('active')) {
+                            document.querySelector('.main_visual .swiper-slide-active').classList.remove('active');
+                        }
+                    }
+                    if (timer >= autoplayDelay) {
+                        document.querySelectorAll('.main_visual .swiper-slide').forEach((slide) => {
+                            if (slide.classList.contains('swiper-slide-active')) {
+                                slide.querySelector('.text_area').style.display = 'none';
+                            }
+                        });
+                        clearInterval(this.slideInterval);
+                        _this.swiper.slideNext();
+                    }
+                }
+            }
+            this.slideInterval = setInterval(autoplayTime, 50);
+        },
+        realIndexChange() {
+            clearInterval(this.slideInterval);
+            this.setAutoplay();
+        },
         onSlideChange (swiper) {
-            // console.log('onSlideChange ::::::::');
-            // console.log(swiper)
+            // console.log('onSlideChange ------------------------------ 1');
             if (this.autoplayDelay) {
                 this.isPlay = true;
                 this.$refs.swiperProgressBar.style.width = '0%';
                 this.swiperDelay = this.state.slides[swiper.realIndex].delay ?? this.state.autoplayDelay;
             }
             this.activeIndex = swiper.realIndex;
+
+            if (this.store.windowInnerWidth > 1124) {
+                document.querySelectorAll('.main_visual .swiper-slide').forEach((slide, index) => {
+                    slide.classList.remove('active');
+                    slide.querySelector('.text_area').style.display = 'none';
+                });
+
+                setTimeout(() => {
+                    const activeSlide = document.querySelector('.main_visual .swiper-slide.swiper-slide-active');
+                    if (activeSlide) {
+                        activeSlide.classList.add('active');
+                        activeSlide.querySelector('.text_area').style.display = 'block';
+                    }
+                    // document.querySelectorAll('.main_visual .swiper-slide').forEach((slide) => {
+                    //     // slide.classList.remove('active');
+                    //     if (slide.classList.contains('swiper-slide-active')) {
+                    //         slide.classList.add('active');
+                    //         slide.querySelector('.text_area').style.display = 'block';
+                    //     }
+                    // });
+                }, 1000);
+            }
+            else {
+                document.querySelectorAll('.main_visual .swiper-slide').forEach((slide, index) => {
+                    slide.querySelector('.text_area').style.display = 'block';
+                });
+            }
         },
         
         pauseResume () {
-            // const isRunning = !this.swiper?.autoplay.paused;
-            // if (this.swiper.realIndex === this.activeIndex) {
-                if (this.isPlay) {
-                    this.swiper.autoplay.pause();
-                    this.isPlay = false;
-                }
-                else {
-                    this.swiper.autoplay.resume();
-                    this.isPlay = true;
-                }
-            // }
+            if (this.isPlay) {
+                // this.swiper.autoplay.pause();
+                this.isPlay = false;
+            }
+            else {
+                // this.swiper.autoplay.resume();
+                this.isPlay = true;
+            }
         },
     },
 }
@@ -194,6 +311,30 @@ export default {
 
 <style lang="scss" scoped>
 .main_visual {
+    .text_area {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 90%;
+        transform: translate(-50%, -50%);
+        margin-top: -8px;
+        text-align: center;
+    }
+    .title {
+        font: {
+            family: Saira Condensed Bold;
+            size: 36px;
+            weight: 700;
+        }
+        color: #fff;
+    }
+    .text {
+        margin-top: 6px;
+        font: {
+            size: 14px;
+        }
+        color: #fff;
+    }
     .slide {
         position: relative;
         height: 59.4666vw;
@@ -210,7 +351,7 @@ export default {
         justify-content: center;
         align-items: center;
         position: absolute;
-        bottom: 10px;
+        bottom: 6px;
         width: 100%;
         z-index: 30;
         gap: 10px;
@@ -220,6 +361,7 @@ export default {
                 size: 12px;
                 weight: 600;
             }
+            color: #fff;
         }
         .bar {
             position: relative;
@@ -246,26 +388,31 @@ export default {
     height: 100%;
 }
 .pause_resume {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 20px;
-    height: 20px;
+    display: inline-block;
+    position: relative;
+    width: 24px;
+    height: 24px;
     text-indent: -9999px;
-    text-align: center;
     overflow: hidden;
+    color: #fff;
     &.play {
-        &::before {
+        &:before {
             content: '';
             display: inline-block;
+            position: absolute;
+            top: 5px;
+            left: 6px;
             width: 2px;
             height: 10px;
             margin: 2px;
             background-color: #fff;
         }
-        &::after {
+        &:after {
             content: '';
             display: inline-block;
+            position: absolute;
+            top: 5px;
+            right: 6px;
             width: 2px;
             height: 10px;
             margin: 2px;
@@ -276,13 +423,45 @@ export default {
         &::before {
             content: '';
             display: inline-block;
+            position: absolute;
+            top: 6px;
+            left: 10px;
             width: 0;
             height: 0;
-            margin-left: 7px;
-            border-bottom: 5px solid transparent;
-            border-top: 5px solid transparent;
-            border-left: 5px solid #fff;
-            border-right: 5px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-top: 6px solid transparent;
+            border-left: 6px solid #fff;
+            border-right: 6px solid transparent;
+        }
+    }
+}
+
+@media (min-width: 600px) {
+    .main_visual {
+        .title {
+            font: {
+                size: 45px;
+            }
+        }
+        .text {
+            // margin-top: 6px;
+            font: {
+                size: 16px;
+            }
+        }
+    }
+}
+@media (min-width: 800px) {
+    .main_visual {
+        .title {
+            font: {
+                size: 60px;
+            }
+        }
+        .text {
+            font: {
+                size: 17px;
+            }
         }
     }
 }
@@ -301,6 +480,66 @@ export default {
             transform:translate(-50%, -50%);
             width: 253px;
         }
+
+        .title {
+            margin-top: 90px;
+            opacity: 0;
+        }
+        .text {
+            opacity: 0;
+        }
+        
+        .swiper-slide {
+            .slide {
+                .title {
+                    margin-top: 90px;
+                    font: {
+                        family: Saira Condensed Bold;
+                        size: 72px;
+                        weight: 700;
+                    }
+                    color: #fff;
+                    opacity: 0;
+                    
+                    animation-duration: 0.5s;
+                    animation-name: upDowonOpacitySlideout_mainVisual;
+                    animation-fill-mode: forwards;
+                }
+                .text {
+                    margin-top: 6px;
+                    font: {
+                        size: 18px;
+                    }
+                    color: #fff;
+                    opacity: 0;
+
+                    animation-duration: 0.5s;
+                    animation-name: opacityout;
+                    animation-fill-mode: forwards;
+                }
+            }
+
+            &.active {
+                .slide {
+                    .title {
+                        opacity: 0;
+                        animation-duration: 0.5s;
+                        animation-name: upDowonOpacitySlidein_mainVisual;
+                        animation-fill-mode: forwards;
+                    }
+                    .text {
+                        opacity: 0;
+                        animation-delay: 0.5s;
+                        animation-duration: 0.5s;
+                        animation-name: opacityIn;
+                        animation-fill-mode: forwards;
+                    }
+                }
+            }
+        }
+
+            
+        
     }
 }
 </style>

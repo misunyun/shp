@@ -7,8 +7,24 @@ export const useDefaultStore = defineStore("defaultStore", {
         // userName: null,
         // userRole: null,
         windowInnerWidth: null,
+        selectData: null,
+
+        activeCenter: {
+            id: 'dsr',
+            name: '전자화성 DSR',
+            class: 'cfc',
+        }
     }),
     actions: {
+        changeCenter(data) {
+            this.activeCenter = data;
+        },
+        openSelect(data) {
+            this.selectData = data;
+        },
+        closeSelect() {
+            this.selectData = null;
+        },
         async moveToPage(data) {
             const router = useNuxtApp().$router;
             await router.push(data);
@@ -17,6 +33,7 @@ export const useDefaultStore = defineStore("defaultStore", {
             const { name, type, data } = obj;
             const eventObject = {
                 MOVE_TO_PAGE: () => this.moveToPage(data),
+                CHANGE_CENTER: () => this.changeCenter(data),
             };
             eventObject[name]();
         },
@@ -24,12 +41,7 @@ export const useDefaultStore = defineStore("defaultStore", {
         resizeEventHandler() {
             const innerWidth = window.innerWidth;
             // console.log('innerWidth ::: ' + innerWidth);
-            const mobileMaxWidth = 751;
-
-            // 751      tablet
-            // 1125     pc
-            // 1176     pc medium
-            // 1440     pc large
+            const mobileMaxWidth = 1125;
 
             if (innerWidth < mobileMaxWidth && !this.isMobile) {
                 this.isMobile = true;
@@ -38,10 +50,14 @@ export const useDefaultStore = defineStore("defaultStore", {
                 this.isMobile = false;
             }
             this.windowInnerWidth = innerWidth;
-            if (innerWidth > 1125) {
-                console.log(innerWidth);// mian visual 사용 예정
+            if (innerWidth < mobileMaxWidth) {
+                if (document.querySelector('#sideMenu')) {
+                    const sideMenu = document.querySelector('#sideMenu');
+                    sideMenu.style.position = 'absolute';
+                    sideMenu.style.right = '20px';
+                    sideMenu.style.top = '0';
+                }
             }
-            // console.log('this.isMobile ::::: ' + this.isMobile);
         },
 
         getDeviceInfo() {
@@ -54,5 +70,5 @@ export const useDefaultStore = defineStore("defaultStore", {
             this.resizeEventHandler();
         },
     },
-    persist: true,
+    // persist: true,
 });

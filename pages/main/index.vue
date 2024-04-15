@@ -1,88 +1,21 @@
 <template>
     <div class="parallax_wrap">
         <div class="parallax">
-
-            <div class="main_header">
-                <button
-                    class="select_store"
-                    :class="{
-                        vantt: store.storeName === 'VANTT',
-                        sds: store.storeName === 'SDS 잠실',
-                        leisure: store.storeName === '삼성레포츠센터',
-                    }"
-                    @click="openSelectStore"
-                >
-                    {{ store.storeName }}
-                </button>
-                
-                <client-only><!-- Nuxt 사용 시 적용 : CSR 적용 시 필요 없음 -->
-                    <vue-bottom-sheet
-                        ref="selectStore"
-                        :max-width="rootStore.windowInnerWidth"
-                    >
-                        <div style="height: 250px; padding: 20px">
-                            {{ rootStore.windowInnerWidth }} AAA
-                            <ul>
-                                <li><button @click="selectStoreValue">전자화성 DSR</button></li>
-                                <li><button @click="selectStoreValue">SDS 잠실</button></li>
-                                <li><button @click="selectStoreValue">삼성레포츠센터</button></li>
-                                <li><button @click="selectStoreValue">VANTT</button></li>
-                            </ul>
-                        </div>
-                    </vue-bottom-sheet>
-                </client-only>
-                
-                <div class="util">
-                    <span class="store_status">쾌적</span>
-                    
-                    <!-- 알림이 있을때 active 클래스 추가 -->
-                    <NuxtLink
-                        :to="{
-                            path: '/notice',
-                            query: { dummyData: 'AAA' },
-                            state: { data: 'TEST' }
-                        }"
-                        class="notice active"
-                        title="알림"
-                    >
-                        알림
-                    </NuxtLink>
-
-                    <div class="photo_wrap">
-                        <NuxtLink
-                            to="/notice"
-                            title="이다인"
-                        >
-                            <!-- 사용자 이미지가 있을때 -->
-                            <img
-                                src="/assets/images/dummy/user_photo_001.jpg"
-                                alt="이다인"
-                                class="photo"
-                            />
-                            <!-- 사용자 이미지가 없을때 -->
-                            <!-- <span class="none_photo">다인</span> -->
-                        </NuxtLink>
-                    </div>
-                    
-                </div>
-            </div>
             
+            <UiHeader />
+
             <div ref="parallax">
-                <!--
-                    주의 사항
-                    PC 버전 슬라이드 링크가 있을때 마우스오버 시 cursor 변경
-                    slides: [ to: 값이 존재 할때 마우스오버 시 cursor가 변경 ]
-                -->
                 <UiMainVisual 
                     :navigation="true"
                     :allowTouchMove="true"
                     :pauseOnMouseEnter="false"
-                    :autoplayDelay="5000"
+                    :autoplayDelay="50000"
                     :slides="[
                         {
-                            to: null,
-                            imgSrc: 'https://picsum.photos/200?1',
-                            movUrl: '',
+                            to: { path: '/' },
+                            imgSrc: '/images/dummy/main_visual_01.png',
+                            title: 'WE’RE STRONGER TOGETHER',
+                            text: '운동메이트와 함께 목표를 향해 달리다',
                         },
                         {
                             to: {
@@ -90,23 +23,27 @@
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            imgSrc: null,
-                            movSrc: 'https://vjs.zencdn.net/v/oceans.mp4',
+                            movSrc: '/images/video/video_2.mp4',
+                            title: 'WE’RE STRONGER TOGETHER',
+                            text: '운동메이트와 함께 목표를 향해 달리다',
                         },
                         {
-                            imgSrc: 'https://picsum.photos/300?1',
-                            movUrl: null,
+                            to: { path: '/' },
+                            movSrc: '/images/video/video_1.mp4',
+                            title: 'WE’RE STRONGER TOGETHER',
+                            text: '운동메이트와 함께 목표를 향해 달리다',
                         },
                         {
-                            imgSrc: 'https://picsum.photos/400?1',
-                        },
-                        {
-                            imgSrc: 'https://picsum.photos/500?1',
+                            to: { path: '/' },
+                            movSrc: '/images/video/video_3.mp4',
+                            title: 'WE’RE STRONGER TOGETHER',
+                            text: '운동메이트와 함께 목표를 향해 달리다',
                         },
 
                     ]"
                 />
 
+                <!-- mobile 전용 -->
                 <div class="icon_list_wrap only_mobile">
                     <ul class="icon_list">
                         <li><NuxtLink class="coupon" to="/works">일일쿠폰</NuxtLink></li>
@@ -116,8 +53,8 @@
                         <li><NuxtLink class="locker" to="/works">보관함</NuxtLink></li>
                     </ul>
                 </div>
-                
             </div>
+
         </div>
     </div>
 
@@ -125,7 +62,7 @@
         <div class="contents">
 
             <!-- pc 전용 -->
-            <div class="icon_list_wrap">
+            <div class="icon_list_wrap only_pc">
                 
                 <ul class="icon_list">
                     <li><NuxtLink class="coupon" to="/works"><span />일일쿠폰</NuxtLink></li>
@@ -135,7 +72,8 @@
                     <li><NuxtLink class="locker" to="/works"><span />보관함</NuxtLink></li>
                 </ul>
 
-                <div class="side">
+                <!-- 정회원 일때 사용 -->
+                <div class="side" id="sideMenu">
                     <div class="side_header">
                         <span class="member_type">정회원</span>
                         <div>
@@ -151,13 +89,37 @@
                         <li><NuxtLink>보관함(개인)<span class="count">26</span></NuxtLink></li>
                         <li><NuxtLink>공용락커<span class="count">35</span></NuxtLink></li>
                         <li><NuxtLink><div class="exclamation_mark">총 입장횟수</div> <span class="count">7</span></NuxtLink></li>
-                        <li><NuxtLink>오늘의 일정<span class="count">7</span></NuxtLink></li>
+                        <li><NuxtLink><div class="today">오늘의 일정</div><span class="count">7</span></NuxtLink></li>
                     </ul>
                 </div>
+
+                <!-- 준회원 일때 사용 -->
+                <!--
+                <div class="side" id="sideMenu">
+                    <div class="side_header">
+                        <span class="member_type associate_member">준회원</span>
+                        <div>
+                            <div class="member_name">
+                                <strong>이다인</strong>
+                            </div>
+                        </div>
+                        <div class="date">
+                            <span>출입이용시간을 <br/>안내해드립니다.</span>
+                        </div>
+                    </div>
+                    <ul class="count_info_pc type1">
+                        <li><NuxtLink>보관함(개인)<span class="count">-</span></NuxtLink></li>
+                        <li><NuxtLink>공용락커<span class="count">-</span></NuxtLink></li>
+                        <li><NuxtLink><div class="exclamation_mark">총 입장횟수</div> <span class="count">-</span></NuxtLink></li>
+                        <li><NuxtLink><div class="today">오늘의 일정</div><span class="count">-</span></NuxtLink></li>
+                    </ul>
+                </div>
+                -->
             </div>
 
             <!-- mobile 전용 -->
             <div class="only_mobile">
+                <!-- 정회원 -->
                 <div class="user_status">정회원 <span class="split">|</span> 2024.03.06 오전 10:30 입장</div>
                 <ul class="count_info_mobile">
                     <li><NuxtLink>보관함(개인)<span class="count">26</span></NuxtLink></li>
@@ -167,26 +129,37 @@
                 <div class="schedule_list_wrap">
                     <NuxtLink class="today">오늘의 일정</NuxtLink>
                     <ul class="schedule_list">
-                        <li><NuxtLink><span class="subject">기구 필라테스 단체 강습 기구 필라테스 단체 강습 기구 필라테스 단체 강습 기구 필라테스 단체 강습</span> <span class="date">오전 11:00</span></NuxtLink></li>
+                        <li><NuxtLink><span class="subject">기구 필라테스 단체 강습</span> <span class="date">오전 11:00</span></NuxtLink></li>
                         <li><NuxtLink><span class="subject">골프 개인 강습</span> <span class="date">오후 3:00</span></NuxtLink></li>
                         <li><NuxtLink><span class="subject">요가 개인 강습</span> <span class="date">오후 6:30</span></NuxtLink></li>
                     </ul>
                 </div>
+
+                <!-- 준회원 -->
+                <!--
+                <div class="user_status associate_member">준회원 <span class="split">|</span> 출입이용시간을 안내해드립니다.</div>
+                <ul class="count_info_mobile">
+                    <li><NuxtLink>보관함(개인)<span class="count">-</span></NuxtLink></li>
+                    <li><NuxtLink>공용락커<span class="count">-</span></NuxtLink></li>
+                    <li><NuxtLink><div class="exclamation_mark">총 입장횟수</div> <span class="count">-</span></NuxtLink></li>
+                </ul>
+                <div class="schedule_list_wrap">
+                    <NuxtLink class="today">오늘의 일정</NuxtLink>
+                    <p class="none_schedule">오늘의 일정이 없습니다.</p>
+                </div>
+                -->
             </div>
 
             <div class="article">
                 <UiMainTitle
                     title="MY 프로그램"
-                    text="다인님이 진행 중인 <strong class='bold'>3개 프로그램</strong>이에요"
+                    text="다인님이 진행 중인 프로그램입니다."
                     class="mb_20"
                 />
 
                 <!--
                     수정 금지 ::: style 관련되어 있음
                     type="MY_PROGRAM"
-
-                    PC 버전 슬라이드 링크가 있을때 마우스오버 시 cursor 변경
-                    slides: [ to: 값이 존재 할때 마우스오버 시 cursor가 변경 ]
                 -->
                 <UiSwiper
                     type="MY_PROGRAM"
@@ -206,15 +179,18 @@
                     }"
                     :slides="[
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/my_program_01.png',
-                            type: '필라테스',
-                            title: '기구 필라테스 단체 강습',
-                            text: '2024.03.08 ~ 2024.03.31(1개월)',
-                            count: {
-                                use: 3,
-                                total: 12,
-                            },
+                            to: { path: '/' },
+                            imgSrc: '/images/png/my_program_01.png',
+                            type: '강습개인',
+                            title: '기구 필라테스',
+                            text: '2024.03.08 ~ 2024.03.31',
+                        },
+                        {
+                            to: { path: '/' },
+                            imgSrc: '/images/png/my_program_03.png',
+                            type: '강습개인',
+                            title: '요가',
+                            text: '2024.03.08 ~ 2024.03.31',
                         },
                         {
                             to: {
@@ -222,56 +198,20 @@
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            src: '/_nuxt/assets/images/png/my_program_02.png',
-                            type: '골프',
-                            title: '골프 개인 강습',
-                            text: '2024.03.08 ~ 2024.03.31(1개월)',
-                            count: {
-                                use: 0,
-                                total: 3,
-                            },
-                        },
-                        {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/my_program_03.png',
-                            type: '요가',
-                            title: '요가 개인 강습',
-                            text: '2024.03.08 ~ 2024.03.31(1개월)',
-                            count: {
-                                use: 8,
-                                total: 20,
-                            },
-                        },
-
-
-                        {
-                            to: {
-                                path: '/notice',
-                                query: { dummyData: 'AAA' },
-                                state: { data: 'TEST' }
-                            },
-                            src: '/_nuxt/assets/images/png/my_program_02.png',
-                            type: '골프',
-                            title: '골프 개인 강습',
-                            text: '2024.03.08 ~ 2024.03.31(1개월)',
-                            count: {
-                                use: 0,
-                                total: 3,
-                            },
-                        },
-                        {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/my_program_03.png',
-                            type: '요가',
-                            title: '요가 개인 강습',
-                            text: '2024.03.08 ~ 2024.03.31(1개월)',
-                            count: {
-                                use: 8,
-                                total: 20,
-                            },
+                            imgSrc: '/images/png/my_program_02.png',
+                            type: '강습단체',
+                            title: '골프',
+                            text: '2024.03.08 ~ 2024.03.31',
                         },
                     ]"
                 />
+                <!-- 데이터가 없을때 사용 -->
+                <div class="none_list none_program">
+                    <p class="text">진행 중인 프로그램이 없습니다.</p>
+                    <div class="btn_area">
+                        <button type="button" class="btn_md bctype1"><span>상담 예약하기</span></button>
+                    </div>
+                </div>
             </div>
 
 
@@ -279,6 +219,7 @@
             <div class="article">
                 <UiMainTitle
                     title="쿠폰"
+                    text="쿠폰 하나도 건강하게 준비했습니다."
                     :more="{ id: 'MORE_COUPON' }"
                     :callback="(data) => console.log(data)"
                     class="mb_20"
@@ -287,7 +228,7 @@
                 <!--
                     수정 금지 ::: style 관련되어 있음
                     type="COUPON"
-                -->
+                -->                 
                 <UiSwiper
                     type="COUPON"
                     :slidesPerView="'auto'"
@@ -303,10 +244,10 @@
                     }"
                     :slides="[
                         {
-                            to: null,
+                            to: { path: '/' },
                             title: '무료',
                             type: '반트 웰컴드링크 무료 쿠폰',
-                            text: '2023.09.07~11.30',
+                            text: '2024.09.07~2024.11.30',
                         },
                         {
                             to: {
@@ -316,40 +257,55 @@
                             },
                             title: '3회 무료',
                             type: '반트 골프 타석 3회 이용권',
-                            text: '2023.09.07~11.30',
+                            text: '2024.09.07~2024.11.30',
+                            count: {
+                                use: 1,
+                                total: 3,
+                            }
                         },
                         {
-                            to: null,
+                            to: { path: '/' },
                             title: '10%',
                             type: '반트 헬스 첫 등록 10%할인',
-                            text: '2023.09.07~11.30',
+                            text: '2024.09.07~2024.11.30',
                         },
                         {
-                            to: null,
+                            to: { path: '/' },
                             title: '10%',
                             type: '반트 헬스 첫 등록 10%할인',
-                            text: '2023.09.07~11.30',
+                            text: '2024.09.07~2024.11.30',
                         },
                         {
-                            to: null,
+                            to: { path: '/' },
                             title: '10%',
                             type: '반트 헬스 첫 등록 10%할인',
-                            text: '2023.09.07~11.30',
+                            text: '2024.09.07~2024.11.30',
                         },
                     ]"
                 />
+
+                <!-- 데이터가 없을때 사용  -->
+                <div class="none_list none_coupon">
+                    <p class="text">준비된 쿠폰이 없습니다.</p>
+                    <div class="btn_area">
+                        <button type="button" class="btn_md bctype1"><span>쿠폰 구매하기</span></button>
+                    </div>
+                </div>
+               
             </div>
 
             <div class="article banner">
-                <img src="/_nuxt/assets/images/png/main_contents_banner_001.png" alt="" />
+                <img src="/images/png/banner_01.png" alt="" />
+                <div class="text_area">
+                    <p class="title">BREAK YOUR BEST</p>
+                    <p class="text">사이클 기록깨기에 도전하세요</p>
+                </div>
             </div>
 
             <div class="article">
                 <UiMainTitle
-                    title="추천 프로그램"
-                    text="다인님께 딱 맞는 프로그램을 추천해드릴게요"
-                    :more="{ id: 'MORE_RECOMMEND' }"
-                    :callback="(data) => console.log(data)"
+                    title="VANTT 추천 프로그램"
+                    text="다양한 추천 프로그램을 즐겨보세요."
                     class="mb_20"
                 />
                 <UiSwiper
@@ -392,10 +348,10 @@
                     }"
                     :slides="[
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/recommend_01.png',
+                            to: { path: '/' },
+                            movSrc: '/images/video/video_3.mp4',
                             events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
-                            type: '골프타석권',
+                            type: '강습단체',
                             title: '골프 강습 Tour',
                         },
                         {
@@ -404,21 +360,25 @@
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            src: '/_nuxt/assets/images/png/recommend_02.png',
-                            events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
-                            type: '골프',
-                            title: '골프 개인 강습',
+                            imgSrc: '/images/png/recommend_02.png',
+                            events: [{ type: 'active', name: '이벤트' }, { type: 'pay', name: '유료' }],
+                            type: '강습개인',
+                            title: '기구 필라테스',
                         },
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/recommend_03.png',
-                            events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
-                            type: '요가',
-                            title: '요가 개인 강습',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/recommend_03.png',
+                            events: [{ type: 'free', name: '무료' }],
+                            type: '강습개인',
+                            title: '수영 신규초급(물공포)',
                         },
+                    ]"
+                />
+                <!--
+                        imgSrc: '/images/png/recommend_01.png',
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/recommend_04.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/recommend_04.png',
                             events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
                             type: '필라테스',
                             title: '기구 필라테스 단체 강습',
@@ -429,20 +389,19 @@
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            src: '/_nuxt/assets/images/png/recommend_05.png',
+                            imgSrc: '/images/png/recommend_05.png',
                             events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
                             type: '골프',
                             title: '골프 개인 강습',
                         },
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/recommend_06.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/recommend_06.png',
                             events: [{ type: 'active', name: '이벤트' }, { type: 'free', name: '무료' }],
                             type: '요가',
                             title: '요가 개인 강습',
                         },
-                    ]"
-                />
+                -->
             </div>
 
 
@@ -451,6 +410,7 @@
             <div class="article type1">
                 <UiMainTitle
                     title="시설안내"
+                    text="편안하고 안전한 시설을 소개합니다."
                     :more="{ id: 'MORE_FACILITY_GUIDE' }"
                     :callback="(data) => console.log(data)"
                     class="mb_20"
@@ -491,8 +451,8 @@
                     }"
                     :slides="[
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/facility_guide_01.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/facility_guide_01.png',
                             type: 'GYM',
                             title: '헬스장',
                         },
@@ -502,35 +462,35 @@
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            src: '/_nuxt/assets/images/png/facility_guide_02.png',
+                            imgSrc: '/images/png/facility_guide_02.png',
                             type: 'AQUATICS',
                             title: '수영장',
                         },
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/facility_guide_03.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/facility_guide_03.png',
                             type: 'GOLF',
                             title: '골프 39타석',
                         },
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/facility_guide_04.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/facility_guide_04.png',
                             type: 'SPA',
                             title: '스파',
                         },
                         {
                             to: {
-                                path: '/notice',
+                                path: '/',
                                 query: { dummyData: 'AAA' },
                                 state: { data: 'TEST' }
                             },
-                            src: '/_nuxt/assets/images/png/facility_guide_05.png',
+                            imgSrc: '/images/png/facility_guide_05.png',
                             type: 'RECEPTION',
                             title: '리셉션',
                         },
                         {
-                            to: null,
-                            src: '/_nuxt/assets/images/png/facility_guide_06.png',
+                            to: { path: '/' },
+                            imgSrc: '/images/png/facility_guide_06.png',
                             type: 'LOUNGE',
                             title: '라운지',
                         },
@@ -584,18 +544,7 @@
         </div>
     </div>
 
-
-
-    <div class="menu_wrap only_mobile">
-        <ul class="menu">
-            <!-- 현재 페이지 class active 추가 -->
-            <li><NuxtLink class="all">전체</NuxtLink></li>
-            <li><NuxtLink class="home active">홈</NuxtLink></li>
-            <li><NuxtLink class="qr">출입</NuxtLink></li>
-            <li><NuxtLink class="reserve">예약</NuxtLink></li>
-            <li><NuxtLink class="my">마이</NuxtLink></li>
-        </ul>
-    </div>
+    <UiMobileBottom v-if="rootStore.windowInnerWidth < 1125" />
 
 </template>
 
@@ -618,15 +567,12 @@ export default {
 
         const rootStore = useDefaultStore();
         const store = useMainStore();
-
         const parallax = ref(null);
-        const selectStore = ref(null);
 
         return {
             rootStore,
             store,
             parallax,
-            selectStore,
         }
     },
     components: {
@@ -635,31 +581,33 @@ export default {
     data() {
         return {
             parallaxOpacity: 0,
+            prevScrollY: 0,
         }
     },
     mounted() {
-        document.removeEventListener('scroll', this.handleScroll);
         document.addEventListener('scroll', this.handleScroll);
         this.handleScroll();
     },
-    onUnmounted() {
+    beforeUnmount() {
         document.removeEventListener('scroll', this.handleScroll);
     },
     methods: {
-        openSelectStore () {
-            if (this.rootStore.windowInnerWidth < 1125) {
-                this.$refs.selectStore.open();
-            }
-        },
-        selectStoreValue (event) {
-            this.store.eventListener({ name: "UPDATE_STORE_NAME", data: event.currentTarget.textContent });
-            this.$refs.selectStore.close();
+
+        showQr() {
+            this.$refs.qr.open();
         },
         handleScroll() {
-            // console.log('this.rootStore.isMobile ::: ' + this.rootStore.isMobile);
-            if (this.rootStore.isMobile) {
-                const scrollY = window.scrollY;
-                const incrementSize = 115;// 노출되지 않는 영역의 height 값에 따라 수치 조절
+            const scrollY = window.scrollY;
+
+            if (this.rootStore.windowInnerWidth < 1125) {
+                // 노출되지 않는 영역의 height 값에 따라 수치 조절
+                const incrementSize = 
+                    this.rootStore.windowInnerWidth < 750 
+                        ? 115 
+                        : this.rootStore.windowInnerWidth < 900 
+                            ? 130 
+                            : 150;
+                // console.log(incrementSize);
                 const increment = scrollY / (incrementSize - 100);
 
                 if (this.$refs.parallax?.style) {
@@ -672,6 +620,21 @@ export default {
                     this.$refs.parallax.style.transform = `translate3d(0px, 0px, 0px)`;
                     this.parallaxOpacity = 0;
                 }
+                const sideMenu = document.querySelector('#sideMenu');
+                if (scrollY > document.querySelector('.parallax_wrap').clientHeight + 212) {
+
+                    const scrollWidth = 17;
+                    const sideRightPosition = (window.innerWidth - scrollWidth - document.querySelector('.icon_list_wrap.only_pc').getBoundingClientRect().width) / 2 + 20;
+
+                    sideMenu.style.position = 'fixed';
+                    sideMenu.style.right = sideRightPosition + 'px';
+                    sideMenu.style.top = '40px';
+                }
+                else {
+                    sideMenu.style.position = 'absolute';
+                    sideMenu.style.right = '20px';
+                    sideMenu.style.top = '216px';
+                }
             }
         },
     },
@@ -679,145 +642,45 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.main_header {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    padding: 0 20px 0;
-    background-color: $header-background-color;
-    font-weight: 500;
-    color: #fff;
-    z-index: 5;
-    .select_store {
+.none_list {
+    padding: 0 20px;
+    &.none_program {
+        .text {
+            background: {
+                image: url("/assets/images/svg/icon/none_program.svg");
+                repeat: no-repeat;
+                position: center 36px;
+            }
+        }
+    }
+    &.none_coupon {
+        .text {
+            background: {
+                image: url("/assets/images/svg/icon/none_coupon.svg");
+                repeat: no-repeat;
+                position: center 48px;
+            }
+        }
+    }
+    .text {
+        padding: 127px 20px 0;
         font: {
             size: 16px;
-            weight: 500;
+            weight: 700;
         }
-        color: #fff;
-        &:after {
-            content: "";
-            display: inline-block;
-            width: 20px;
-            height: 5px;
-            background-image: url("/assets/images/svg/icon/arrow_down_white.svg");
-            background-repeat: no-repeat;
-            background-position: 0;
-            vertical-align: middle;
-        }
-        &.vantt {
-            padding: 0 0 0 25px;
-            background-image: url("/assets/images/svg/icon/logo_vantt.svg");
-            background-repeat: no-repeat;
-            background-position: 0;
-        }
-        &.sds {
-            padding: 0 0 0 25px;
-            background-image: url("/assets/images/svg/icon/logo_sds.svg");
-            background-repeat: no-repeat;
-            background-position: 0;
-        }
-        &.leisure {
-            padding: 0 0 0 25px;
-            background-image: url("/assets/images/svg/icon/logo_leisure.svg");
-            background-repeat: no-repeat;
-            background-position: 0;
-        }
-    }
-    .util {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        flex: 1;
-        text-align: right;
-
-        .photo_wrap {
-            width: 28px;
-            height: 28px;
-            margin-left: 16px;
-            .photo,
-            .none_photo {
-                width: 28px;
-                height: 28px;
-                border-radius: 15px;
-                // animation
-                // animation-duration: 0.5s;
-                // animation-name: blurSlideout;
-                // &:hover {
-                //     animation-duration: 0.5s;
-                //     animation-name: blurSlidein;
-                //     animation-fill-mode: forwards;
-                // }
-            }
-            .none_photo {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font: {
-                    size: 12px;
-                    weight: 400;
-                }
-                background-color: $active-color;
-                text-align: center;
-            }
-        }
-        .notice {
-            display: block;
-            position: relative;
-            width: 24px;
-            height: 24px;
-            margin-left: 15px;
-            background-image: url("/assets/images/svg/icon/schedule_white.svg");
-            background-repeat: no-repeat;
-            background-position: center;
-            text-align: left;
-            text-indent: -9999px;
-            overflow: hidden;
-        }
-        .notice {
-            background-image: url("/assets/images/svg/icon/notice_white.svg");
-            &.active {
-                &:after {
-                    content: "";
-                    display: block;
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 4px;
-                    height: 4px;
-                    background-color: #ff4b41;
-                    border-radius: 2px;
-                }
-            }
-        }
-    }
-    .store_status {
-        display: inline-block;
-        min-width: 47px;
-        height: 20px;
-        padding: 3px 8px 0 8px;
-        margin-top: 2px;
-        background-color: rgba(143, 239, 253, 0.1);
-        border-radius: 4px;
-        font: {
-            size: 12px;
-            weight: 500;
-        }
-        color: #8feffd;
         text-align: center;
-        vertical-align: middle;
-        &:after {
-            content: "";
-            display: inline-block;
-            width: 12px;
-            height: 14px;
-            margin-left: 5px;
-            background-image: url("/assets/images/svg/icon/exclamation_mark_blue.svg");
-            background-repeat: no-repeat;
-            vertical-align: middle;
+    }
+    .btn_area {
+        // max-width: 330px;
+        margin: 48px auto 0;
+    }
+}
+
+
+.pc {
+    .parallax_wrap {
+        .parallax {
+            padding: 0;
         }
     }
 }
@@ -828,7 +691,7 @@ export default {
         width: 100%;
         height: 100%;
         padding: 60px 0 0 0;
-        background-color: #000;
+        background-color: $header-background-color;
         color: #fff;
         // scroll 적용 시 상단 어두워지는 영역
         &:after {
@@ -937,8 +800,8 @@ export default {
         margin: 0 auto;
         // background-color: #f00;
         .side {
-            position: absolute; 
-            top: 216px; 
+            position: absolute;
+            top: 224px; 
             right: 20px; 
             width: 125px; 
             height: 530px; 
@@ -962,7 +825,11 @@ export default {
                 margin: 32px auto 0;
                 background-color: $font-color-dark-ultra;
                 border-radius: 4px;
+                font-size: 13px;
                 color: #fff;
+                &.associate_member {
+                    background-color: #A0A4AB;
+                }
             }
             .member_name {
                 display: inline-block;
@@ -993,6 +860,7 @@ export default {
                 background-color: #EEF0F8;
                 border-radius: 4px;
                 color: $font-color-light;
+                font-size: 13px;
                 > span {
                     display: inline-block;
                 }
@@ -1014,12 +882,12 @@ export default {
         a {
             display: block;
             position: relative;
-            width: 80px;
+            width: 90px;
             min-height: 116px;
             padding: 98px 0 0;
             margin: 0 auto;
             font: {
-                size: 15px;
+                size: 16px;
                 weight: 400;
             }
             color: $font-color-dark-ultra;
@@ -1029,7 +897,8 @@ export default {
                 display: block;
                 position: absolute;
                 top: 0;
-                left: 0;
+                left: 50%;
+                transform: translate(-50%, 0);
                 width: 80px;
                 height: 80px;
                 border: {
@@ -1114,6 +983,9 @@ export default {
         border: {
             radius: 20px;
         }
+        &.associate_member {
+            background-color: #A0A4AB;
+        }
         font: {
             size: 12px;
             weight: 400;
@@ -1145,6 +1017,7 @@ export default {
             }
             color: $font-color-light;
             text-align: center;
+            /*
             .exclamation_mark {
                 &:after {
                     content: "";
@@ -1157,6 +1030,7 @@ export default {
                     vertical-align: middle;
                 }
             }
+            */
         }
         .count {
             display: block;
@@ -1166,6 +1040,15 @@ export default {
                 weight: 700;
             }
             color: $font-color-dark-ultra;
+        }
+        .today {
+            display: inline-block;
+            padding: 0 10px 0 0;
+            background: {
+                image: url("/assets/images/svg/icon/arrow_right_gray.svg");
+                repeat: no-repeat;
+                position: right center;
+            }
         }
     }
     .count_info_mobile {
@@ -1207,6 +1090,7 @@ export default {
             }
             color: $font-color-light;
             text-align: center;
+            /*
             .exclamation_mark {
                 &:after {
                     content: "";
@@ -1219,6 +1103,7 @@ export default {
                     vertical-align: middle;
                 }
             }
+            */
         }
         .count {
             display: block;
@@ -1263,6 +1148,17 @@ export default {
             radius: 10px;
         }
     }
+    .none_schedule {
+        align-content: center;
+        height: 90px;
+        padding-bottom: 25px;
+        margin-top: 17px;
+        font: {
+            size: 16px;
+            weight: 700;
+        }
+        text-align: center;
+    }
     .schedule_list, .notification_list {
         margin-top: 17px;
         > li {
@@ -1270,6 +1166,7 @@ export default {
             height: 30px;
             > a {
                 display: flex;
+                font-size: 15px;
                 .subject {
                     display: block;
                     flex: 1;
@@ -1329,11 +1226,35 @@ export default {
             }
         }
         &.banner {
+            position: relative;
             height: 42.666vw;
-            img {
+            img, video {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+            }
+            .text_area {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 90%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+            .title {
+                font: {
+                    family: Saira Condensed Bold;
+                    size: 32px;
+                    weight: 700;
+                }
+                color: #fff;
+            }
+            .text {
+                margin-top: 9px;
+                font: {
+                    size: 14px;
+                }
+                color: #fff;
             }
         }
     }
@@ -1379,99 +1300,32 @@ export default {
         }
     }
 }
-
-.menu_wrap {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    z-index: 10;
-    .menu {
-        display: flex;
-        > li {
-            flex: 1;
-            text-align: center;
-            a {
-                display: inline-block;
-                position: relative;
-                width: 60px;
-                height: 62px;
-                padding-top: 38px;
-                font: {
-                    size: 11px;
-                    weight: 400;
-                }
-                color: $font-color-dark-ultra;
-
-                &.active {
-                    font: {
-                        weight: 700;
-                    }
-                }
-                &.all {
-                    background: {
-                        image: url("/assets/images/svg/icon/menu_all.svg");
-                        repeat: no-repeat;
-                        position: center 15px;
-                    }
-                }
-                &.home {
-                    background: {
-                        image: url("/assets/images/svg/icon/menu_home.svg");
-                        repeat: no-repeat;
-                        position: center 11px;
-                    }
-                }
-                &.qr {
-                    &:before {
-                        content: '';
-                        display: block;
-                        position: absolute;
-                        top: -26px;
-                        left: 0;
-                        width: 60px;
-                        height: 60px;
-                        background-image: linear-gradient(180deg, #FFFFFF 0%, #DFDFE6 100%);
-                        border-radius: 30px;
-                    }
-                    &:after {
-                        content: '';
-                        display: inline-block;
-                        position: absolute;
-                        top: -22px;
-                        left: 4px;
-                        width: 52px;
-                        height: 52px;
-                        background-color: $header-background-color;
-                        background: {
-                            image: url("/assets/images/svg/icon/menu_qr.svg");
-                            repeat: no-repeat;
-                            position: center;
-                        }
-                        border-radius: 30px;
-                    }
-                }
-                &.reserve {
-                    background: {
-                        image: url("/assets/images/svg/icon/menu_reserve.svg");
-                        repeat: no-repeat;
-                        position: center 11px;
-                    }
-                }
-                &.my {
-                    background: {
-                        image: url("/assets/images/svg/icon/menu_my.svg");
-                        repeat: no-repeat;
-                        position: center 12px;
-                    }
-                }
-            }
+@media (min-width: 750px) {
+    .none_list {
+        .btn_area {
+            max-width: 330px;
+            margin: 48px auto 0;
         }
     }
 }
 
 @media (min-width: 1125px) {
+    .none_list {
+        max-width: 1240px;
+        padding: 0 $screen-1125-side-width 0 20px;
+        margin: 0 auto;
+        .text {
+            padding: 132px 20px 0;
+            font: {
+                size: 18px;
+            }
+        }
+        .btn_area {
+            max-width: 330px;
+            margin: 93px auto 0;
+        }
+    }
+
     .only_mobile {
         display: none;
     }
@@ -1520,13 +1374,28 @@ export default {
                     }
                 }
             }
+
+            &.banner {
+                .title {
+                    font: {
+                        size: 48px;
+                    }
+                }
+                .text {
+                    font: {
+                        size: 18px;
+                    }
+                }
+            }
         }
     }
-
-    
-    
 }
+
 @media (min-width: 1176px) {
+    .none_list {
+        padding: 0 $screen-1176-side-width 0 20px;
+    }
+
     .container {
         .icon_list_wrap {
             .side {
@@ -1542,6 +1411,9 @@ export default {
                 }
                 .count_info_pc {
                     margin: 65px auto 0;
+                    &.type1 {
+                        margin: 51px auto 0;
+                    }
                 }
             }
         }
@@ -1557,6 +1429,10 @@ export default {
     }
 }
 @media (min-width: 1440px) {
+    .none_list {
+        padding: 0 $screen-1440-side-width 0 20px;
+    }
+
     .contents {
         .article {
             &.up_750 {

@@ -45,7 +45,7 @@
 
 <style lang="scss" scoped>
 .page_list {
-    width: 600px;
+    // width: 600px;
     margin: 0 auto;
     ul {
         display: flex;
@@ -58,7 +58,7 @@
         gap: 10px;
 
         li {
-            width: 49%;
+            width: 32%;
             min-height: 70px;
             // width: 250px;
         }

@@ -10,9 +10,6 @@ export const useMainStore = defineStore("mainStore", {
         onSlideChange() {
             console.log('onSlideChange');
         },
-        updateStoreName(storeName) {
-            this.storeName = storeName;
-        },
         selectStore() {
             console.log('selectStore ------------------');
         },
@@ -26,7 +23,6 @@ export const useMainStore = defineStore("mainStore", {
             const eventObject = {
                 ON_SWIPER: () => this.onSwiper(data),
                 ON_SLIDE_CHANGE: () => this.onSlideChange(data),
-                UPDATE_STORE_NAME: () => this.updateStoreName(data),
                 CLICK_BUTTON: () => this.clickButton(),
                 SELECT_STORE: () => this.selectStore(),
                 

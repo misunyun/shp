@@ -7,23 +7,36 @@
         <NuxtLayout>
             <NuxtPage />
         </NuxtLayout>
+        <UiSelect :data="store.selectData" v-if="store.selectData" />
     </div>
 </template>
 <script >
+import { ref } from 'vue';
 import { useDefaultStore } from "~/stores";
+
+import VueBottomSheet from "@webzlodimir/vue-bottom-sheet";
+import "@webzlodimir/vue-bottom-sheet/dist/style.css";
+
 export default {
     setup() {
         const store = useDefaultStore();
-        return { store };
+        const bottomSheet = ref(null);
+        return { 
+            store,
+            bottomSheet,
+        };
+    },
+    components: {
+        VueBottomSheet,
     },
     mounted() {
 
         const userAgent = navigator.userAgent;
         this.isMobile = /Mobile|iP(ad|hone|od)|Android|BlackBerry|IEMobile/i.test(userAgent);
 
-        console.log(userAgent);
-        console.log(this.isMobile);
-        console.log(window.innerWidth);
+        // console.log(userAgent);
+        // console.log(this.isMobile);
+        // console.log(window.innerWidth);
 
         this.store.init({ isMobile: false });
     },
